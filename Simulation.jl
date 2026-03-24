@@ -2,7 +2,7 @@
 # Librería
 # =========================
 using Plots
-gr()  # backend rápido
+gr()
 
 # =========================
 # Tipos
@@ -42,7 +42,7 @@ function run_with_points(sim::PiSimulation)
 end
 
 # =========================
-# Simulación rápida (sin guardar puntos)
+# Simulación rápida
 # =========================
 function run(sim::PiSimulation)
     inside = 0
@@ -67,45 +67,49 @@ function porcentaje_error(estimado)
 end
 
 # =========================
-# Gráfica de puntos
+# Gráfica 1: puntos
 # =========================
 function plot_simulation(inside_x, inside_y, outside_x, outside_y)
     θ = range(0, stop=pi/2, length=200)
     circle_x = cos.(θ)
     circle_y = sin.(θ)
 
-    scatter(outside_x, outside_y,
+    p1 = scatter(outside_x, outside_y,
         label="Fuera",
         markersize=2)
 
-    scatter!(inside_x, inside_y,
+    scatter!(p1, inside_x, inside_y,
         label="Dentro",
         markersize=2)
 
-    plot!(circle_x, circle_y,
+    plot!(p1, circle_x, circle_y,
         label="Círculo",
         linewidth=2)
 
-    plot!([0,1,1,0,0], [0,0,1,1,0],
+    plot!(p1, [0,1,1,0,0], [0,0,1,1,0],
         label="Cuadrado",
         linewidth=2)
 
-    xlabel!("x")
-    ylabel!("y")
-    title!("Monte Carlo π (visualización)")
+    xlabel!(p1, "x")
+    ylabel!(p1, "y")
+    title!(p1, "Monte Carlo π (puntos)")
+
+    return p1
 end
 
 # =========================
-# Gráfica puntos vs error
+# Gráfica 2: error vs puntos
 # =========================
 function plot_error_vs_points(points_list, errors)
-    plot(points_list, errors,
+    p2 = plot(points_list, errors,
         marker=:o,
         xlabel="Número de puntos",
         ylabel="Error (%)",
         title="Convergencia de Monte Carlo",
         label="Error",
-        xscale=:log10)  # 🔥 clave para ver bien la convergencia
+        xscale=:log10)
+
+    return p2
 end
 
 # =========================
@@ -114,9 +118,7 @@ end
 function main()
     println("Simulación Monte Carlo para π")
 
-    # =====================
-    # 1. Visualización de puntos
-    # =====================
+    # -------- Gráfica 1 --------
     n_visual = 5000
     sim_visual = PiSimulation(n_visual)
 
@@ -124,16 +126,13 @@ function main()
     error = porcentaje_error(est)
 
     println("\n--- Visualización ---")
-    println("Puntos: ", n_visual)
     println("π estimado: ", est)
     println("π real: ", Float64(pi))
     println("Error %: ", error)
 
-    plot_simulation(ix, iy, ox, oy)
+    p1 = plot_simulation(ix, iy, ox, oy)
 
-    # =====================
-    # 2. Convergencia (puntos vs error)
-    # =====================
+    # -------- Gráfica 2 --------
     println("\n--- Convergencia ---")
 
     points_list = [100, 1000, 5000, 10000, 50000, 100000]
@@ -145,14 +144,13 @@ function main()
         err = porcentaje_error(est)
 
         println("n = ", n, " → error = ", err, "%")
-
         push!(errors, err)
     end
 
-    plot_error_vs_points(points_list, errors)
+    p2 = plot_error_vs_points(points_list, errors)
+
+    # -------- MOSTRAR AMBAS --------
+    plot(p1, p2, layout=(1,2))  # 🔥 clave: dos gráficas lado a lado
 end
 
-# =========================
-# Ejecutar
-# =========================
 main()
