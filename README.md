@@ -1,4 +1,3 @@
-````markdown
 # Simulación de π con el método de Monte Carlo (Julia)
 
 ## Descripción
@@ -69,5 +68,3 @@ Pluto.run()
 
 Leonel Hernández
 
-```
-```
